@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HA Mart - Burhanpur Ka Apna Kirana Store</title>
+    <!-- Tailwind CSS for modern, rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for beautiful, localized icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Warm, friendly display & body fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#F59E0B',    // Turmeric/Haldi Yellow
+                            terracotta: '#D97706', // Warm spice Orange
+                            dark: '#2D2219',     // Earthy Charcoal/Clay
+                            light: '#FFFBEB',    // Soft Butter Cream background
+                            green: '#15803D',    // Fresh mint/green leaf
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #FFFBEB;
+            color: #2D2219;
+        }
+        .header-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col pb-16 md:pb-0">
+
+    <!-- TOP HEADER -->
+    <header class="bg-brand-dark text-white sticky top-0 z-40 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold header-font text-brand-gold tracking-wide">HA Mart</h1>
+                <p class="text-xs text-orange-200"><i class="fa-solid fa-location-dot text-brand-gold"></i> Burhanpur Ka Apna Kirana</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Admin shortcut button -->
+                <button onclick="toggleView('admin-login-section')" class="text-xs bg-amber-800/50 hover:bg-amber-700/50 border border-brand-gold/30 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all">
+                    <i class="fa-solid fa-lock text-brand-gold"></i> Admin Area
+                </button>
+                
+                <!-- Cart Trigger Button -->
+                <button onclick="toggleCart()" class="relative p-2.5 bg-brand-terracotta hover:bg-orange-700 rounded-full transition-all">
+                    <i class="fa-solid fa-basket-shopping text-lg"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-white text-brand-dark font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center border border-brand-dark">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- FLOATING WHATSAPP BUTTON (Quick Store Contact) -->
+    <a href="https://wa.me/917722978095?text=Hello%20HA%20Mart,%20mujhe%20kirana%20order%20karna%20hai." target="_blank" 
+       class="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+    </a>
+
+    <!-- MAIN INTERACTIVE CONTAINER -->
+    <main class="max-w-6xl w-full mx-auto px-4 py-6 flex-grow">
+
+        <!-- ================= CUSTOMER STORE FRONT VIEW ================= -->
+        <div id="customer-view" class="space-y-6">
+            
+            <!-- HERO BANNER -->
+            <div class="bg-gradient-to-r from-amber-700 to-amber-900 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg border-b-4 border-brand-gold">
+                <div class="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
+                    <i class="fa-solid fa-mortar-pestle text-9xl"></i>
+                </div>
+                <div class="relative z-10 max-w-lg">
+                    <span class="bg-brand-gold text-brand-dark text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">100% Shudh aur Asli</span>
+                    <h2 class="text-3xl font-extrabold header-font mt-3 leading-tight">Burhanpur ka apna swadeshi kirana store!</h2>
+                    <p class="text-orange-100 text-sm mt-2">Dukaan se sasta, ghar baithe pure maal. Online select karo, WhatsApp ya COD se order pao.</p>
+                    
+                    <div class="flex flex-wrap gap-3 mt-4">
+                        <span class="bg-white/10 backdrop-blur-sm border border-white/20 px-3 py-1 rounded-md text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-truck text-brand-gold"></i> Ghar Pahoch Delivery
+                        </span>
+                        <span class="bg-white/10 backdrop-blur-sm border border-white/20 px-3 py-1 rounded-md text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-hand-holding-dollar text-brand-gold"></i> Only Cash on Delivery (COD)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEARCH & CATEGORY SELECTOR -->
+            <div class="space-y-4">
+                <div class="relative">
+                    <input id="search-input" type="text" oninput="filterProducts()" placeholder="Chawal, Daal, Sakkar, Namak search karein..." 
+                           class="w-full bg-white border-2 border-amber-200 focus:border-brand-terracotta focus:outline-none rounded-xl py-3.5 pl-11 pr-4 text-brand-dark shadow-sm transition-all">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-amber-600/70 text-lg"></i>
+                </div>
+
+                <!-- Horizontal Scroll Categories -->
+                <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
+                    <button onclick="selectCategory('All')" id="cat-All" class="category-btn active bg-brand-terracotta text-white px-5 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-all shadow-sm">
+                        Sabhi Maal (All)
+                    </button>
+                    <button onclick="selectCategory('Chawal & Daal')" id="cat-Chawal-Daal" class="category-btn bg-white border border-amber-200 text-brand-dark hover:bg-amber-100 px-5 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-all shadow-sm">
+                        Chawal & Daal
+                    </button>
+                    <button onclick="selectCategory('Sakar & Namak')" id="cat-Sakar-Namak" class="category-btn bg-white border border-amber-200 text-brand-dark hover:bg-amber-100 px-5 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-all shadow-sm">
+                        Sakkar, Namak & Atta
+                    </button>
+                    <button onclick="selectCategory('Tel & Masale')" id="cat-Tel-Masale" class="category-btn bg-white border border-amber-200 text-brand-dark hover:bg-amber-100 px-5 py-2 rounded-full font-medium text-sm whitespace-nowrap transition-all shadow-sm">
+                        Tel & Masale
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRODUCT CATALOG GRID -->
+            <div>
+                <h3 class="text-xl font-bold header-font mb-4 flex items-center gap-2 text-brand-dark">
+                    <i class="fa-solid fa-basket-shopping text-brand-terracotta"></i> Aaj ke Taaza Rates
+                </h3>
+                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Dynamic Product Cards will render here -->
+                </div>
+            </div>
+
+            <!-- COD BADGE SECTION -->
+            <div class="bg-amber-100 border-2 border-dashed border-brand-terracotta/40 rounded-xl p-4 flex items-center gap-4">
+                <div class="bg-brand-terracotta text-white rounded-full p-3 h-12 w-12 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-indian-rupee-sign text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-brand-dark">Cash on Delivery (COD) Only</h4>
+                    <p class="text-xs text-amber-900/80">Online payment ka jhanjhat nahi! Delivery milne par hi paise dein. Khush aur surakshit kharidari.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= CART OVERLAY / SIDE DRAWER ================= -->
+        <div id="cart-drawer" class="fixed inset-0 bg-black/60 z-50 hidden flex justify-end transition-opacity">
+            <div class="bg-brand-light w-full max-w-md h-full flex flex-col shadow-2xl relative">
+                <!-- Drawer Header -->
+                <div class="bg-brand-dark text-white p-4 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-basket-shopping text-brand-gold text-lg"></i>
+                        <h3 class="text-lg font-bold header-font">Aapka Cart</h3>
+                    </div>
+                    <button onclick="toggleCart()" class="text-white/80 hover:text-white p-2 text-xl">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Drawer Content / Cart Items -->
+                <div class="flex-grow overflow-y-auto p-4 space-y-4" id="cart-items-container">
+                    <!-- Cart items render dynamically -->
+                </div>
+
+                <!-- Checkout Section -->
+                <div class="bg-white border-t border-amber-200 p-4 space-y-4">
+                    <div class="flex justify-between items-center text-lg font-bold text-brand-dark">
+                        <span>Total Bill:</span>
+                        <span id="cart-total" class="text-brand-terracotta">₹0</span>
+                    </div>
+
+                    <!-- Cart actions -->
+                    <div id="cart-actions" class="space-y-3">
+                        <button onclick="showCheckoutForm()" class="w-full bg-brand-terracotta hover:bg-orange-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all">
+                            <i class="fa-solid fa-circle-check"></i> Form Bharein aur Order Karein
+                        </button>
+                        <button onclick="orderViaWhatsAppDirect()" class="w-full bg-[#25D366] hover:bg-green-600 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> Direct WhatsApp par Bhejein
+                        </button>
+                    </div>
+
+                    <!-- Checkout Form (Hidden by default, shown when clicking 'Form Bharein') -->
+                    <form id="checkout-form" class="hidden space-y-3 pt-2 border-t border-dashed border-amber-200 max-h-[300px] overflow-y-auto" onsubmit="handleCheckout(event)">
+                        <h4 class="font-bold text-brand-dark text-sm border-b pb-1">Delivery Details (Burhanpur Only)</h4>
+                        <div>
+                            <label class="block text-xs font-semibold text-brand-dark/70">Aapka Naam *</label>
+                            <input type="text" id="cust-name" required class="w-full text-sm bg-amber-50 border border-amber-200 rounded-lg p-2 focus:outline-brand-terracotta">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-brand-dark/70">WhatsApp/Phone Number *</label>
+                            <input type="tel" id="cust-phone" required class="w-full text-sm bg-amber-50 border border-amber-200 rounded-lg p-2 focus:outline-brand-terracotta">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-brand-dark/70">Burhanpur ka Pura Pata (Address) *</label>
+                            <textarea id="cust-address" required rows="2" class="w-full text-sm bg-amber-50 border border-amber-200 rounded-lg p-2 focus:outline-brand-terracotta" placeholder="Ghar No., Gali, Nagar/Area..."></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-brand-dark/70">Delivery Din *</label>
+                                <select id="delivery-day" class="w-full text-sm bg-amber-50 border border-amber-200 rounded-lg p-2 focus:outline-brand-terracotta">
+                                    <option value="Aaj hi (Today)">Aaj hi (Today)</option>
+                                    <option value="Kal (Tomorrow)">Kal (Tomorrow)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-brand-dark/70">Time Choice</label>
+                                <select id="delivery-time" class="w-full text-sm bg-amber-50 border border-amber-200 rounded-lg p-2 focus:outline-brand-terracotta">
+                                    <option value="Subah (9 AM - 1 PM)">Subah (9AM - 1PM)</option>
+                                    <option value="Shaam (4 PM - 8 PM)">Shaam (4PM - 8PM)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-brand-dark/70">Khas Note (Optional)</label>
+                            <input type="text" id="order-notes" placeholder="e.g. Chawal thoda purana bhejiyega" class="w-full text-sm bg-amber-50 border border-amber-200 rounded-lg p-2 focus:outline-brand-terracotta">
+                        </div>
+                        
+                        <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-xs text-amber-900">
+                            <strong>Note:</strong> Sirf Cash on Delivery (COD) available hai. Delivery milne par paise dein.
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button type="button" onclick="hideCheckoutForm()" class="w-1/3 bg-gray-200 text-brand-dark font-bold py-2 rounded-lg text-sm">Cancel</button>
+                            <button type="submit" class="w-2/3 bg-brand-green text-white font-bold py-2 rounded-lg text-sm">Confirm Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ADMIN LOGIN PAGE ================= -->
+        <div id="admin-login-section" class="hidden max-w-md mx-auto my-12 bg-white border border-amber-200 rounded-2xl p-6 shadow-xl">
+            <h3 class="text-2xl font-bold header-font text-brand-dark text-center mb-4">Admin Log In</h3>
+            <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm">
+                Galat Password! Dubara koshish karein.
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-brand-dark mb-1">Username</label>
+                    <input type="text" id="admin-user" value="admin" readonly class="w-full bg-gray-100 border border-amber-200 rounded-xl p-3 focus:outline-none cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-brand-dark mb-1">Password</label>
+                    <input type="password" id="admin-pass" placeholder="Password daalein (admin123)" class="w-full border border-amber-200 rounded-xl p-3 focus:outline-brand-terracotta">
+                </div>
+                <button onclick="handleAdminLogin()" class="w-full bg-brand-dark hover:bg-black text-white font-bold py-3 rounded-xl transition-all">
+                    Ander Aayein (Login)
+                </button>
+                <button onclick="toggleView('customer-view')" class="w-full text-sm text-brand-terracotta underline text-center block mt-2">
+                    Back to Kirana Store
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= ADMIN DASHBOARD ================= -->
+        <div id="admin-dashboard-section" class="hidden space-y-8">
+            <div class="flex justify-between items-center border-b border-amber-200 pb-4">
+                <div>
+                    <h2 class="text-3xl font-extrabold header-font text-brand-dark">Admin Dashboard</h2>
+                    <p class="text-sm text-orange-800">Dukaan ke order aur samaan yahan se sambhalein.</p>
+                </div>
+                <button onclick="handleAdminLogout()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all">
+                    Log Out
+                </button>
+            </div>
+
+            <!-- ORDER LIST SECTION -->
+            <div class="bg-white border border-amber-200 rounded-2xl p-6 shadow-md">
+                <h3 class="text-xl font-bold header-font mb-4 text-brand-dark flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-brand-terracotta"></i> Grahak ke Order (Customer Orders)
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-brand-dark text-white text-sm">
+                                <th class="p-3 rounded-l-lg">Order ID</th>
+                                <th class="p-3">Grahak (Customer Details)</th>
+                                <th class="p-3">Kharidari (Items Ordered)</th>
+                                <th class="p-3">Total Bill</th>
+                                <th class="p-3">Delivery Date Choice</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 rounded-r-lg">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table-body" class="text-sm divide-y divide-amber-100">
+                            <!-- Dynamically loaded orders -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PRODUCT MANAGEMENT SECTION -->
+            <div class="bg-white border border-amber-200 rounded-2xl p-6 shadow-md">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold header-font text-brand-dark flex items-center gap-2">
+                        <i class="fa-solid fa-boxes-stacked text-brand-terracotta"></i> Samaan List (Manage Products)
+                    </h3>
+                    <button onclick="openProductModal('add')" class="bg-brand-green hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1">
+                        <i class="fa-solid fa-plus"></i> Naya Samaan Add Karein
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-amber-100 text-brand-dark font-bold text-sm">
+                                <th class="p-3 rounded-l-lg">Samaan (Product)</th>
+                                <th class="p-3">Category</th>
+                                <th class="p-3">Vajan (Weight)</th>
+                                <th class="p-3">Rate (Price)</th>
+                                <th class="p-3 rounded-r-lg">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-products-table-body" class="text-sm divide-y divide-amber-100">
+                            <!-- Dynamically loaded editable items -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PRODUCT MANAGEMENT MODAL (ADD / EDIT) -->
+    <div id="product-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 relative shadow-2xl">
+            <button onclick="closeProductModal()" class="absolute right-4 top-4 text-gray-500 hover:text-black">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 id="modal-title" class="text-xl font-bold header-font mb-4 text-brand-dark">Naya Samaan Add Karein</h3>
+            
+            <form id="product-form" onsubmit="saveProduct(event)" class="space-y-4">
+                <input type="hidden" id="modal-product-id">
+                <div>
+                    <label class="block text-xs font-bold text-brand-dark">Samaan ka Naam (Hinglish/Hindi) *</label>
+                    <input type="text" id="modal-name" required placeholder="e.g. Kohinoor Basmati Chawal" class="w-full mt-1 border border-amber-200 rounded-lg p-2.5">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-dark">Category *</label>
+                        <select id="modal-category" class="w-full mt-1 border border-amber-200 rounded-lg p-2.5">
+                            <option value="Chawal & Daal">Chawal & Daal</option>
+                            <option value="Sakar & Namak">Sakar & Namak</option>
+                            <option value="Tel & Masale">Tel & Masale</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-brand-dark">Vajan (Weight) *</label>
+                        <input type="text" id="modal-unit" required placeholder="e.g. 1kg, 5kg" class="w-full mt-1 border border-amber-200 rounded-lg p-2.5">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-dark">Rate (₹ Price) *</label>
+                        <input type="number" id="modal-price" required placeholder="e.g. 110" class="w-full mt-1 border border-amber-200 rounded-lg p-2.5">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-brand-dark">Photo URL (Optional)</label>
+                        <input type="text" id="modal-image" placeholder="Image URL ya khali chhodein" class="w-full mt-1 border border-amber-200 rounded-lg p-2.5">
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-brand-terracotta hover:bg-orange-700 text-white font-bold py-3 rounded-xl mt-4">
+                    Save Karein
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION POPUP -->
+    <div id="notification" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-brand-dark text-white font-medium px-6 py-3 rounded-full shadow-2xl z-50 flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-brand-gold"></i>
+        <span id="notification-text">Item Cart me jod diya hai!</span>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-orange-100 border-t-2 border-brand-gold mt-auto">
+        <div class="max-w-6xl mx-auto px-4 py-8 text-center space-y-3">
+            <h2 class="text-xl font-bold header-font text-brand-gold">HA Mart — Burhanpur</h2>
+            <p class="text-xs text-orange-200/70">Hamari koi doosri branch nahi hai. Purane Subhash Chowk ke paas, Burhanpur (M.P.)</p>
+            <div class="flex justify-center gap-4 text-xs font-medium text-brand-gold">
+                <span><i class="fa-solid fa-hand-holding-dollar"></i> Only COD</span>
+                <span>•</span>
+                <span><i class="fa-brands fa-whatsapp"></i> Order on WhatsApp: +91 7722978095</span>
+            </div>
+            <p class="text-[10px] text-amber-900/40 pt-4">© 2026 HA Mart. Designed with Native Kirana Style.</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE APP SCRIPT -->
+    <script>
+        // --- 1. INITIAL STATE & CORE DATABASE ---
+        let products = [
+            { id: 1, name: "Basmati Chawal (Premium)", category: "Chawal & Daal", unit: "1kg", price: 95, image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=400" },
+            { id: 2, name: "Arhar / Toor Daal", category: "Chawal & Daal", unit: "1kg", price: 160, image: "https://images.unsplash.com/photo-1585996388444-672901968846?auto=format&fit=crop&q=80&w=400" },
+            { id: 3, name: "Premium Sakkar (Sugar)", category: "Sakar & Namak", unit: "1kg", price: 44, image: "https://images.unsplash.com/photo-1581781862414-07fa0a8278ab?auto=format&fit=crop&q=80&w=400" },
+            { id: 4, name: "Tata Salt Namak", category: "Sakar & Namak", unit: "1kg", price: 28, image: "https://images.unsplash.com/photo-1626132647523-66f5bf380027?auto=format&fit=crop&q=80&w=400" },
+            { id: 5, name: "Ashirvaad Shudh Chakki Atta", category: "Sakar & Namak", unit: "5kg", price: 245, image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=400" },
+            { id: 6, name: "Soya Refined Tel (Oil)", category: "Tel & Masale", unit: "1 Litre", price: 125, image: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=80&w=400" },
+            { id: 7, name: "Haldi Powder (Turmeric)", category: "Tel & Masale", unit: "200g", price: 45, image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&q=80&w=400" },
+            { id: 8, name: "Lal Mirch Powder", category: "Tel & Masale", unit: "200g", price: 65, image: "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&q=80&w=400" }
+        ];
+
+        let cart = [];
+        let orders = [
+            {
+                id: "ORD-1082",
+                customer: { name: "Ramesh Sharma", phone: "+91 98270XXXXX", address: "Lalbagh Chauraha, Burhanpur" },
+                items: "Basmati Chawal x2, Ashirvaad Shudh Chakki Atta x1",
+                total: 435,
+                delivery: "Aaj hi (Today) | Shaam (4 PM - 8 PM)",
+                status: "Pending"
+            }
+        ];
+
+        let selectedCategory = "All";
+        let searchKeyword = "";
+        let isAdminLoggedIn = false;
+
+        // --- 2. RENDER ENGINE ---
+        function initApp() {
+            renderProducts();
+            updateCartUI();
+            renderAdminOrders();
+            renderAdminProducts();
+        }
+
+        // Render customer catalog
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = "";
+
+            const filtered = products.filter(p => {
+                const matchCategory = selectedCategory === "All" || p.category === selectedCategory;
+                const matchSearch = p.name.toLowerCase().includes(searchKeyword.toLowerCase()) || 
+                                    p.category.toLowerCase().includes(searchKeyword.toLowerCase());
+                return matchCategory && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-2 md:col-span-4 text-center py-12 text-brand-dark/60">
+                        <i class="fa-solid fa-cookie-bite text-5xl mb-3 text-amber-600/30"></i>
+                        <p class="font-bold">Aisa koi samaan nahi mila!</p>
+                        <p class="text-xs mt-1">Kuch aur naam likhkar search karein.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md border border-amber-100 flex flex-col justify-between transition-all";
+                
+                // Fallback image handling
+                const imgUrl = p.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400';
+
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${imgUrl}" alt="${p.name}" class="w-full h-32 md:h-40 object-cover bg-amber-50">
+                        <span class="absolute top-2 left-2 bg-brand-dark/80 text-brand-gold text-[10px] font-bold px-2 py-0.5 rounded">
+                            ${p.unit}
+                        </span>
+                    </div>
+                    <div class="p-3 flex-grow flex flex-col justify-between">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-brand-terracotta">${p.category}</span>
+                            <h4 class="font-bold text-brand-dark text-sm md:text-base line-clamp-2 mt-0.5">${p.name}</h4>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-lg font-black text-brand-dark">₹${p.price}</span>
+                                <span class="text-xs text-brand-dark/50">/ ${p.unit}</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-1.5 mt-2">
+                                <button onclick="addToCart(${p.id})" class="w-full bg-brand-gold hover:bg-amber-500 text-brand-dark font-bold py-1.5 rounded-lg text-xs flex items-center justify-center gap-1 transition-all">
+                                    <i class="fa-solid fa-plus"></i> Cart me Dalein
+                                </button>
+                                <button onclick="orderSingleProductWhatsApp('${p.name}', '${p.unit}', ${p.price})" class="w-full bg-white border border-[#25D366] hover:bg-emerald-50 text-[#25D366] font-bold py-1 rounded-lg text-[11px] flex items-center justify-center gap-1 transition-all">
+                                    <i class="fa-brands fa-whatsapp"></i> Buy on WA
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- 3. CART SYSTEM ---
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existing = cart.find(item => item.product.id === productId);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ product, quantity: 1 });
+            }
+
+            showNotification(`"${product.name}" cart me jod diya gaya hai!`);
+            updateCartUI();
+        }
+
+        function updateCartQty(productId, delta) {
+            const item = cart.find(i => i.product.id === productId);
+            if (!item) return;
+
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.product.id !== productId);
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const countBadge = document.getElementById('cart-count');
+            const drawerContainer = document.getElementById('cart-items-container');
+            const totalSpan = document.getElementById('cart-total');
+
+            // Count badge
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            countBadge.innerText = totalItems;
+
+            // Compute total price
+            const totalPrice = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+            totalSpan.innerText = `₹${totalPrice}`;
+
+            // Render drawer items
+            if (cart.length === 0) {
+                drawerContainer.innerHTML = `
+                    <div class="text-center py-12 text-brand-dark/50 space-y-2">
+                        <i class="fa-solid fa-basket-shopping text-5xl text-amber-200"></i>
+                        <p class="font-bold">Aapka Cart khali hai!</p>
+                        <p class="text-xs">Samaan chuniye aur upar diye buttons se add karein.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            drawerContainer.innerHTML = "";
+            cart.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-white border border-amber-100 p-3 rounded-xl flex justify-between items-center shadow-sm";
+                itemDiv.innerHTML = `
+                    <div>
+                        <h5 class="font-bold text-brand-dark text-sm">${item.product.name}</h5>
+                        <p class="text-xs text-brand-dark/60">Rate: ₹${item.product.price} | Vajan: ${item.product.unit}</p>
+                        <p class="text-xs font-bold text-brand-terracotta mt-1">Total: ₹${item.product.price * item.quantity}</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-amber-100/70 p-1.5 rounded-lg">
+                        <button onclick="updateCartQty(${item.product.id}, -1)" class="w-6 h-6 bg-white hover:bg-amber-100 rounded flex items-center justify-center text-brand-dark font-black text-xs">-</button>
+                        <span class="font-bold text-sm w-4 text-center">${item.quantity}</span>
+                        <button onclick="updateCartQty(${item.product.id}, 1)" class="w-6 h-6 bg-white hover:bg-amber-100 rounded flex items-center justify-center text-brand-dark font-black text-xs">+</button>
+                    </div>
+                `;
+                drawerContainer.appendChild(itemDiv);
+            });
+        }
+
+        // Drawer toggle
+        function toggleCart() {
+            const drawer = document.getElementById('cart-drawer');
+            drawer.classList.toggle('hidden');
+        }
+
+        // --- 4. ORDER CHANNELS ---
+        
+        // Channel A: Direct single item WhatsApp order
+        function orderSingleProductWhatsApp(name, unit, price) {
+            const storeNumber = "917722978095";
+            const text = `Namaste HA Mart! Mujhe ye saman order karna hai:\n\n*Samaan:* ${name}\n*Vajan:* ${unit}\n*Rate:* ₹${price}\n\nKripya delivery jaldi karwa dein. Cash on Delivery (COD).`;
+            const encodedText = encodeURIComponent(text);
+            window.open(`https://wa.me/${storeNumber}?text=${encodedText}`, '_blank');
+        }
+
+        // Channel B: Send entire cart straight to WhatsApp
+        function orderViaWhatsAppDirect() {
+            if (cart.length === 0) {
+                showNotification("Aapka cart khali hai!");
+                return;
+            }
+
+            const storeNumber = "917722978095";
+            let message = `Namaste HA Mart! Mera naya order ye raha:\n\n`;
+            let total = 0;
+            
+            cart.forEach((item, index) => {
+                const subTotal = item.product.price * item.quantity;
+                total += subTotal;
+                message += `${index + 1}. *${item.product.name}* (${item.product.unit})\n   Qty: ${item.quantity} | Total: ₹${subTotal}\n\n`;
+            });
+
+            message += `*Pura Total Bill:* ₹${total}\n`;
+            message += `*Payment Method:* Cash on Delivery (COD)\n\n_Kripya mera order confirm karein._`;
+            
+            const encodedText = encodeURIComponent(message);
+            window.open(`https://wa.me/${storeNumber}?text=${encodedText}`, '_blank');
+        }
+
+        // Channel C: Form-based checkout to Admin Dashboard
+        function showCheckoutForm() {
+            if (cart.length === 0) {
+                showNotification("Pehle Cart me samaan dalein!");
+                return;
+            }
+            document.getElementById('cart-actions').classList.add('hidden');
+            document.getElementById('checkout-form').classList.remove('hidden');
+        }
+
+        function hideCheckoutForm() {
+            document.getElementById('checkout-form').classList.add('hidden');
+            document.getElementById('cart-actions').classList.remove('hidden');
+        }
+
+        function handleCheckout(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const address = document.getElementById('cust-address').value;
+            const day = document.getElementById('delivery-day').value;
+            const time = document.getElementById('delivery-time').value;
+            const note = document.getElementById('order-notes').value;
+
+            // Compile item list
+            let itemsString = cart.map(item => `${item.product.name} (${item.product.unit}) x${item.quantity}`).join(', ');
+            let totalBill = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+
+            // Create order object for dashboard
+            const newOrder = {
+                id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+                customer: { name, phone, address },
+                items: itemsString,
+                total: totalBill,
+                delivery: `${day} | ${time} ${note ? `(Note: ${note})` : ''}`,
+                status: "Pending"
+            };
+
+            // Add to live orders array
+            orders.unshift(newOrder);
+            renderAdminOrders();
+
+            // Success feedback
+            alert(`Sunder! Aapka order hume mil gaya hai.\nOrder ID: ${newOrder.id}\n\nHamara delivery partner jald hi aapke address par maal pahochayega.`);
+            
+            // Clear cart & reset form
+            cart = [];
+            updateCartUI();
+            document.getElementById('checkout-form').reset();
+            hideCheckoutForm();
+            toggleCart();
+        }
+
+        // --- 5. CATEGORY & FILTER MECHANICS ---
+        function selectCategory(category) {
+            selectedCategory = category;
+            
+            // Update UI class of active/inactive category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-terracotta', 'text-white');
+                btn.classList.add('bg-white', 'border', 'border-amber-200', 'text-brand-dark');
+            });
+
+            // Convert raw spaces/symbols to select correct element id
+            const targetId = `cat-${category.replace(/ & /g, '-').replace(/, /g, '-')}`;
+            const activeBtn = document.getElementById(targetId) || document.getElementById('cat-All');
+            activeBtn.classList.remove('bg-white', 'border', 'border-amber-200', 'text-brand-dark');
+            activeBtn.classList.add('bg-brand-terracotta', 'text-white');
+
+            renderProducts();
+        }
+
+        function filterProducts() {
+            searchKeyword = document.getElementById('search-input').value;
+            renderProducts();
+        }
+
+        // --- 6. ADMIN SYSTEM MANAGEMENT ---
+        function handleAdminLogin() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === 'hamart50') {
+                isAdminLoggedIn = true;
+                document.getElementById('login-error').classList.add('hidden');
+                toggleView('admin-dashboard-section');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function handleAdminLogout() {
+            isAdminLoggedIn = false;
+            document.getElementById('admin-pass').value = "";
+            toggleView('customer-view');
+        }
+
+        function toggleView(sectionId) {
+            document.getElementById('customer-view').classList.add('hidden');
+            document.getElementById('admin-login-section').classList.add('hidden');
+            document.getElementById('admin-dashboard-section').classList.add('hidden');
+
+            if (sectionId === 'admin-dashboard-section' && !isAdminLoggedIn) {
+                document.getElementById('admin-login-section').classList.remove('hidden');
+            } else {
+                document.getElementById(sectionId).classList.remove('hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Render orders to dashboard table
+        function renderAdminOrders() {
+            const tbody = document.getElementById('admin-orders-table-body');
+            tbody.innerHTML = "";
+
+            orders.forEach(ord => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-amber-50/50";
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-brand-dark">${ord.id}</td>
+                    <td class="p-3">
+                        <p class="font-bold text-brand-dark">${ord.customer.name}</p>
+                        <p class="text-xs text-brand-dark/80">${ord.customer.phone}</p>
+                        <p class="text-[11px] text-orange-950/60 leading-tight mt-0.5">${ord.customer.address}</p>
+                    </td>
+                    <td class="p-3 max-w-[200px] break-words text-xs text-brand-dark/80">${ord.items}</td>
+                    <td class="p-3 font-bold text-brand-terracotta">₹${ord.total}</td>
+                    <td class="p-3 text-xs text-brand-dark/70">${ord.delivery}</td>
+                    <td class="p-3">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold ${ord.status === 'Delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${ord.status}
+                        </span>
+                    </td>
+                    <td class="p-3">
+                        ${ord.status === 'Pending' ? `
+                            <button onclick="markAsDelivered('${ord.id}')" class="bg-brand-green hover:bg-emerald-700 text-white font-semibold py-1 px-2.5 rounded text-xs">
+                                Delivered Karein
+                            </button>
+                        ` : '<span class="text-xs text-gray-400 font-semibold"><i class="fa-solid fa-check-double"></i> Done</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function markAsDelivered(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = "Delivered";
+                renderAdminOrders();
+                showNotification(`Order ${orderId} delivered mark ho gaya!`);
+            }
+        }
+
+        // Render current products inside admin view
+        function renderAdminProducts() {
+            const tbody = document.getElementById('admin-products-table-body');
+            tbody.innerHTML = "";
+
+            products.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-amber-50/50";
+                tr.innerHTML = `
+                    <td class="p-3 flex items-center gap-2">
+                        <img src="${p.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400'}" class="w-8 h-8 rounded object-cover">
+                        <span class="font-bold text-brand-dark">${p.name}</span>
+                    </td>
+                    <td class="p-3 text-xs text-brand-dark/70">${p.category}</td>
+                    <td class="p-3 font-semibold text-brand-dark/85">${p.unit}</td>
+                    <td class="p-3 font-bold text-brand-terracotta">₹${p.price}</td>
+                    <td class="p-3 flex gap-2">
+                        <button onclick="openProductModal('edit', ${p.id})" class="text-blue-600 hover:text-blue-800 font-bold text-xs"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                        <button onclick="deleteProduct(${p.id})" class="text-red-600 hover:text-red-800 font-bold text-xs"><i class="fa-solid fa-trash"></i> Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- 7. PRODUCT MANAGEMENT CONTROLLERS ---
+        function openProductModal(mode, id = null) {
+            const modal = document.getElementById('product-modal');
+            const title = document.getElementById('modal-title');
+            const form = document.getElementById('product-form');
+            form.reset();
+            
+            if (mode === 'add') {
+                title.innerText = "Naya Samaan Add Karein";
+                document.getElementById('modal-product-id').value = "";
+            } else if (mode === 'edit') {
+                title.innerText = "Samaan Ki Detials Badlein";
+                const p = products.find(prod => prod.id === id);
+                if (p) {
+                    document.getElementById('modal-product-id').value = p.id;
+                    document.getElementById('modal-name').value = p.name;
+                    document.getElementById('modal-category').value = p.category;
+                    document.getElementById('modal-unit').value = p.unit;
+                    document.getElementById('modal-price').value = p.price;
+                    document.getElementById('modal-image').value = p.image || "";
+                }
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function saveProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('modal-product-id').value;
+            const name = document.getElementById('modal-name').value;
+            const category = document.getElementById('modal-category').value;
+            const unit = document.getElementById('modal-unit').value;
+            const price = parseFloat(document.getElementById('modal-price').value);
+            const image = document.getElementById('modal-image').value;
+
+            if (id) {
+                // Edit mode
+                const index = products.findIndex(p => p.id == id);
+                if (index !== -1) {
+                    products[index] = { id: parseInt(id), name, category, unit, price, image };
+                }
+            } else {
+                // Add mode
+                const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+                products.push({ id: newId, name, category, unit, price, image });
+            }
+
+            initApp();
+            closeProductModal();
+            showNotification("Samaan save ho gaya!");
+        }
+
+        function deleteProduct(id) {
+            if (confirm("Kya aap sach me ye samaan list se hatana chahte hain?")) {
+                products = products.filter(p => p.id !== id);
+                initApp();
+                showNotification("Samaan safalta se delete hua!");
+            }
+        }
+
+        // --- Helper: App notifications ---
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notification-text').innerText = text;
+            notif.classList.remove('translate-y-20', 'opacity-0');
+            notif.classList.add('translate-y-0', 'opacity-100');
+            
+            setTimeout(() => {
+                notif.classList.remove('translate-y-0', 'opacity-100');
+                notif.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Bootstrapping
+        window.onload = initApp;
+    </script>
+</body>
+</html>
